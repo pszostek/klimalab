@@ -1,2 +1,8 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import { Card } from 'flowbite-svelte';
+  </script>
+
+
+<Card class="mx-auto my-10" href="/cards">
+    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Witaj świecie!</h5>
+  </Card>

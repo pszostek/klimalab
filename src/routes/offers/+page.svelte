@@ -1,0 +1,108 @@
+<script>
+  import { offers } from "../../store";
+  import { timestampToDate } from "../../utils";
+
+  import {
+    Table,
+    TableBody,
+    TableBodyCell,
+    TableBodyRow,
+    TableHead,
+    TableHeadCell,
+    Checkbox,
+    Button,
+    Modal,
+    Label,
+    Input,
+    TableSearch,
+  } from "flowbite-svelte";
+  let searchName = "";
+  $: filteredItems = $offers.filter(
+    (item) =>
+      item.client_surname.toLowerCase().indexOf(searchName.toLowerCase()) !==
+      -1,
+  );
+
+  let formModal;
+  function addNewOffer() {}
+</script>
+
+<Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
+  <form class="flex flex-col space-y-6" action="#">
+    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">
+      Sign in to our platform
+    </h3>
+    <Label class="space-y-2">
+      <span>Email</span>
+      <Input
+        type="email"
+        name="email"
+        placeholder="name@company.com"
+        required
+      />
+    </Label>
+    <Label class="space-y-2">
+      <span>Your password</span>
+      <Input type="password" name="password" placeholder="•••••" required />
+    </Label>
+    <div class="flex items-start">
+      <Checkbox>Remember me</Checkbox>
+      <a
+        href="/"
+        class="ms-auto text-sm text-primary-700 hover:underline dark:text-primary-500"
+      >
+        Lost password?
+      </a>
+    </div>
+    <Button type="submit" class="w-full1">Login to your account</Button>
+    <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+      Not registered? <a
+        href="/"
+        class="text-primary-700 hover:underline dark:text-primary-500"
+      >
+        Create account
+      </a>
+    </div>
+  </form>
+</Modal>
+
+<TableSearch
+  placeholder="Szukaj po nazwisku"
+  hoverable={true}
+  bind:inputValue={searchName}
+>
+  <TableHead>
+    <TableHeadCell>Klient</TableHeadCell>
+    <TableHeadCell>Data utworzenia</TableHeadCell>
+    <TableHeadCell>Data modyfikacji</TableHeadCell>
+    <TableHeadCell>Kod</TableHeadCell>
+    <TableHeadCell />
+  </TableHead>
+  <TableBody>
+    {#each filteredItems as offer (offer.id)}
+      <TableBodyRow>
+        <TableBodyCell
+          >{offer.client_surname + " " + offer.client_name}</TableBodyCell
+        >
+        <TableBodyCell
+          >{timestampToDate(offer.creation_timestamp)}</TableBodyCell
+        >
+        <TableBodyCell
+          >{timestampToDate(offer.modification_timestamp)}</TableBodyCell
+        >
+        <TableBodyCell>{offer.shortcode}</TableBodyCell>
+        <TableBodyCell
+          ><Button><a href="offers/{offer.id}">Zobacz</a></Button
+          ></TableBodyCell
+        >
+      </TableBodyRow>
+    {/each}
+  </TableBody>
+</TableSearch>
+
+<button
+  title="Add new"
+  on:click={() => (formModal = true)}
+  class="fixed z-90 bottom-10 right-8 bg-primary-600 w-20 h-20 rounded-full drop-shadow-lg flex justify-center items-center text-white text-4xl hover:bg-primary-700 hover:drop-shadow-2xl hover:animate-bounce duration-300"
+  >+</button
+>
