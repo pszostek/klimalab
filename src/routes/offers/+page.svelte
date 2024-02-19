@@ -1,6 +1,6 @@
 <script>
-  import { offers } from "../../store";
-  import { timestampToDate } from "../../utils";
+  import { offers, clients } from "../../store";
+  import { clientString, getClientById, timestampToDate } from "../../utils";
 
   import {
     Table,
@@ -16,15 +16,19 @@
     Input,
     TableSearch,
   } from "flowbite-svelte";
-  let searchName = "";
-  $: filteredItems = $offers.filter(
-    (item) =>
-      item.client_surname.toLowerCase().indexOf(searchName.toLowerCase()) !==
-      -1,
+  let searchTerm = "";
+
+  $: filteredOffers = $offers.filter(
+    (offer) => {
+      let client = getClientById($clients, offer.client_id);
+      console.log(client);
+      return (client.surname.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) ||
+       (client.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) ||
+       (client.address.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1);
+    }
   );
 
   let formModal;
-  function addNewOffer() {}
 </script>
 
 <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
@@ -69,7 +73,7 @@
 <TableSearch
   placeholder="Szukaj po nazwisku"
   hoverable={true}
-  bind:inputValue={searchName}
+  bind:inputValue={searchTerm}
 >
   <TableHead>
     <TableHeadCell>Klient</TableHeadCell>
@@ -79,10 +83,10 @@
     <TableHeadCell />
   </TableHead>
   <TableBody>
-    {#each filteredItems as offer (offer.id)}
+    {#each filteredOffers as offer (offer.id)}
       <TableBodyRow>
         <TableBodyCell
-          >{offer.client_surname + " " + offer.client_name}</TableBodyCell
+          >{clientString(getClientById($clients, offer.client_id))}</TableBodyCell
         >
         <TableBodyCell
           >{timestampToDate(offer.creation_timestamp)}</TableBodyCell
@@ -99,10 +103,3 @@
     {/each}
   </TableBody>
 </TableSearch>
-
-<button
-  title="Add new"
-  on:click={() => (formModal = true)}
-  class="fixed z-90 bottom-10 right-8 bg-primary-600 w-20 h-20 rounded-full drop-shadow-lg flex justify-center items-center text-white text-4xl hover:bg-primary-700 hover:drop-shadow-2xl hover:animate-bounce duration-300"
-  >+</button
->
